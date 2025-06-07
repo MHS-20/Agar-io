@@ -24,19 +24,20 @@ object Main extends SimpleSwingApplication:
   private val manager = new MockGameStateManager(World(width, height, players, foods))
 
   def apply(): Behavior[Nothing] = Behaviors.setup[Nothing] { context =>
-    val gameManager = context.spawn(GameManagerActor(), "gameManager")
+    val gameManager = context.spawn(GameManagerActor(players, foods), "gameManager")
     val foodGenerator = context.spawn(FoodGeneratorActor(), "foodGenerator")
-    val ai1 = context.spawn(AIplayerActor("ai1"), "aiPlayer1")
-    //val ai2 = context.spawn(AIplayerActor("ai2"), "aiPlayer2")
+
+    for (i <- 1 to numPlayers) {
+      context.spawn(AIplayerActor(s"ai$i"), s"aiPlayer$i")
+    }
+
     val player1 = context.spawn(PlayerActor("player1"), "player1")
 
     //    Swing.onEDT {
     //      new GlobalView(gameManager).open()
     //    }
-
-    Behaviors.empty
-
     //new GlobalView(manager).open()
+    Behaviors.empty
   }
 
   override def top: Frame = new Frame {

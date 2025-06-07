@@ -7,12 +7,12 @@ import it.unibo.agar.model.{EatingManager, Food, Player, World}
 
 object GameManagerActor {
   val GameManagerServiceKey: ServiceKey[GameManagerCommand] = ServiceKey[GameManagerCommand]("GameManager")
-  
-  def apply(): Behavior[GameManagerCommand] = Behaviors.setup { context =>
+
+  def apply(initialPlayers: Seq[Player], initialFood: Seq[Food]): Behavior[GameManagerCommand] = Behaviors.setup { context =>
     context.system.receptionist ! Receptionist.Register(GameManagerServiceKey, context.self)
     var players = Map.empty[String, ActorRef[PlayerCommand]]
-    var world = World(width = 1000, height = 1000, players = Seq.empty, foods = Seq.empty)
-    
+    var world = World(width = 1000, height = 1000, players = initialPlayers, foods = initialFood)
+
     def broadcastWorld(): Unit =
       players.values.foreach(_ ! WorldUpdate(world))
 
@@ -68,7 +68,7 @@ object GameManagerActor {
 
       case RequestWorld(replyTo) =>
         replyTo ! WorldResponse(world)
-        Behaviors.same  
+        Behaviors.same
     }
   }
 }
