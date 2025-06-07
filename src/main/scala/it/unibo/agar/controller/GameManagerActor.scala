@@ -21,7 +21,7 @@ object GameManagerActor {
         context.log.info(s"Player $id joined")
         players += (id -> replyTo)
         // Add new player to world
-        val newPlayer = Player(id, x = 0, y = 0, mass = 100)
+        val newPlayer = Player(id, x = 0, y = 0, mass = 120)
         world = world.copy(players = world.players :+ newPlayer)
         broadcastWorld()
         replyTo ! StartGame()
@@ -45,16 +45,20 @@ object GameManagerActor {
             // Check for food eaten
             val eatenFoods = world.foods.filter(food => EatingManager.canEatFood(movedPlayer, food))
             val updatedPlayer = eatenFoods.foldLeft(movedPlayer)((p, f) => p.grow(f))
-
-            // Remove eaten foods from world
             val remainingFoods = world.foods.filterNot(eatenFoods.contains)
-            // Update players and foods
-            val updatedPlayers = world.players.map {
-              case p if p.id == id => updatedPlayer
-              case other => other
-            }
 
-            world = world.copy(players = updatedPlayers, foods = remainingFoods)
+            val eatenPlayers = world.players.filter { other =>
+              other.id != id && EatingManager.canEatPlayer(updatedPlayer, other)}
+            val playerAfterPlayers = eatenPlayers.foldLeft(updatedPlayer)((p, other) => p.grow(other))
+            val remainingPlayers = world.players.filterNot(p => eatenPlayers.contains(p) || p.id == id) :+ playerAfterPlayers
+
+            // Update players and foods
+//            val updatedPlayers = world.players.map {
+//              case p if p.id == id => updatedPlayer
+//              case other => other
+//            }
+
+            world = world.copy(players = remainingPlayers, foods = remainingFoods)
             broadcastWorld()
 
           case None => // Player not found

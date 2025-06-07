@@ -26,7 +26,7 @@ object AIplayerActor {
         context.system.receptionist ! Receptionist.Subscribe(GameManagerServiceKey, listingAdapter)
 
         // timer per AI ticks
-        timers.startTimerAtFixedRate(Tick, 200.millis)
+        timers.startTimerAtFixedRate(Tick, 100.millis)
 
         Behaviors.receiveMessage {
           case GameManagerListing(gameManagers) =>
@@ -42,8 +42,8 @@ object AIplayerActor {
           case WorldUpdate(world) =>
             lastWorld = Some(world)
             Behaviors.same
-            
-          case StartGame() => 
+
+          case StartGame() =>
             context.log.info(s"AIPlayer $id: game started")
             // Inizializzare la logica di gioco, se necessario
             Behaviors.same

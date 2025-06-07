@@ -13,17 +13,21 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 
+import scala.util.Random
+
 object Main extends SimpleSwingApplication:
 
   private val width = 1000
   private val height = 1000
   private val numPlayers = 4
   private val numFoods = 100
-  private val players = GameInitializer.initialPlayers(numPlayers, width, height)
+  private var players = GameInitializer.initialPlayers(numPlayers, width, height)
   private val foods = GameInitializer.initialFoods(numFoods, width, height)
   private val manager = new MockGameStateManager(World(width, height, players, foods))
 
   def apply(): Behavior[Nothing] = Behaviors.setup[Nothing] { context =>
+    players = players :+ Player(s"player1", Random.nextInt(width), Random.nextInt(height), 120.0)
+
     val gameManager = context.spawn(GameManagerActor(players, foods), "gameManager")
     val foodGenerator = context.spawn(FoodGeneratorActor(), "foodGenerator")
 
