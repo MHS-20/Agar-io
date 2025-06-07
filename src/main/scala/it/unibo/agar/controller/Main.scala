@@ -13,6 +13,10 @@ import java.util.TimerTask
 import scala.swing.*
 import scala.swing.Swing.onEDT
 
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.Behaviors
+
 object Main extends SimpleSwingApplication:
 
   private val width = 1000
@@ -23,18 +27,40 @@ object Main extends SimpleSwingApplication:
   private val foods = GameInitializer.initialFoods(numFoods, width, height)
   private val manager = new MockGameStateManager(World(width, height, players, foods))
 
-  private val timer = new Timer()
-  private val task: TimerTask = new TimerTask:
-    override def run(): Unit =
-      AIMovement.moveAI("p1", manager)
-      manager.tick()
-      onEDT(Window.getWindows.foreach(_.repaint()))
-  timer.scheduleAtFixedRate(task, 0, 30) // every 30ms
+  def apply(): Behavior[Nothing] = Behaviors.setup[Nothing] { context =>
+    val gameManager = context.spawn(GameManagerActor(), "gameManager")
+    val foodGenerator = context.spawn(FoodGeneratorActor(), "foodGenerator")
+    val ai1 = context.spawn(AIplayerActor("ai1"), "aiPlayer1")
+    val ai2 = context.spawn(AIplayerActor("ai2"), "aiPlayer2")
+    val player1 = context.spawn(PlayerActor("player1"), "player1")
+    
+//    Swing.onEDT {
+//      new GlobalView(gameManager).open()
+//    }
 
-  override def top: Frame =
-    // Open both views at startup
-    new GlobalView(manager).open()
-    new LocalView(manager, "p1").open()
-    new LocalView(manager, "p2").open()
-    // No launcher window, just return an empty frame (or null if allowed)
-    new Frame { visible = false }
+    Behaviors.empty
+    
+    //new GlobalView(manager).open()
+  }
+
+  override def top: Frame = new Frame { visible = false }
+
+  override def main(args: Array[String]): Unit =
+    ActorSystem(Main(), "AgarSystem")
+    super.main(args)
+  
+//  private val timer = new Timer()
+//  private val task: TimerTask = new TimerTask:
+//    override def run(): Unit =
+//      AIMovement.moveAI("p1", manager)
+//      manager.tick()
+//      onEDT(Window.getWindows.foreach(_.repaint()))
+//  timer.scheduleAtFixedRate(task, 0, 30)
+
+//  override def top: Frame =
+//    // Open both views at startup
+//    new GlobalView(manager).open()
+//    new LocalView(manager, "p1").open()
+//    new LocalView(manager, "p2").open()
+//    // No launcher window, just return an empty frame (or null if allowed)
+//    new Frame { visible = false }

@@ -1,7 +1,6 @@
 package it.unibo.agar.model
 
 sealed trait Entity:
-
   def id: String
   def mass: Double
   def x: Double
@@ -14,12 +13,10 @@ sealed trait Entity:
     math.hypot(dx, dy)
 
 case class Player(id: String, x: Double, y: Double, mass: Double) extends Entity:
-
   def grow(entity: Entity): Player =
     copy(mass = mass + entity.mass)
 
 case class Food(id: String, x: Double, y: Double, mass: Double = 100.0) extends Entity
-
 case class World(
     width: Int,
     height: Int,
