@@ -35,7 +35,7 @@ object FoodGeneratorActor {
         case GameManagerListing(gameManagers) =>
           gameManagers.headOption match {
             case Some(gmRef) if gameManagerOpt.isEmpty =>
-              context.log.info("Trovato GameManager, salvo riferimento")
+              context.log.info("GameManager found, storing its reference")
               active(Some(gmRef))
             case _ => Behaviors.same
           }

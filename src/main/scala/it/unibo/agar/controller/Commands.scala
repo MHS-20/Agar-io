@@ -10,7 +10,7 @@ final case class FoodGenerated(food: Food) extends GameManagerCommand
 final case class JoinPlayer(id: String, replyTo: ActorRef[PlayerCommand]) extends GameManagerCommand
 final case class LeavePlayer(id: String) extends GameManagerCommand
 final case class RequestWorld(replyTo: ActorRef[WorldResponse]) extends GameManagerCommand
-final case class WorldResponse(world: it.unibo.agar.model.World)
+final case class WorldResponse(world: it.unibo.agar.model.World) extends GameManagerCommand
 
 // Receptionist Listing
 sealed trait ReceptionistListingMessage

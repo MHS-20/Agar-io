@@ -37,10 +37,13 @@ object Main extends SimpleSwingApplication:
 
     val player1 = context.spawn(PlayerActor("player1"), "player1")
 
-    //    Swing.onEDT {
-    //      new GlobalView(gameManager).open()
-    //    }
-    //new GlobalView(manager).open()
+    val globalView = new GlobalView
+    context.spawn(GlobalViewActor(globalView), "globalViewActor")
+
+    onEDT {
+      globalView.open()
+    }
+
     Behaviors.empty
   }
 
