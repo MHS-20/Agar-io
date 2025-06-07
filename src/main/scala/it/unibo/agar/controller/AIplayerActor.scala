@@ -54,8 +54,11 @@ object AIplayerActor {
               world <- lastWorld
               (dx, dy) <- AIMovement.computeDirectionTowardNearestFood(id, world)
             } gm ! PlayerMove(id, dx, dy)
-
             Behaviors.same
+            
+          case GameOver(winner) =>
+            context.log.info(s"AIPlayer $id: game over, winner is $winner")
+            Behaviors.stopped
         }
       }
     }

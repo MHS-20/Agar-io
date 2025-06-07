@@ -43,3 +43,12 @@ class LocalView(playerId: String) extends MainFrame:
   def updateWorld(world: World): Unit =
     currentWorld = Some(world)
     repaint()
+    
+  def showGameOver(winner: String): Unit =
+    Dialog.showMessage(
+      contents.head,
+      s"Game Over! Winner: $winner",
+      title = "Game Over",
+      Dialog.Message.Info
+    )
+    close()

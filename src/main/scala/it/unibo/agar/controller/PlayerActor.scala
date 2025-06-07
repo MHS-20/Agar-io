@@ -45,6 +45,11 @@ object PlayerActor {
           // Aggiornare la view con il nuovo stato del mondo
           localView.updateWorld(world)
           Behaviors.same
+
+        case GameOver(winner) =>
+          context.log.info(s"Player $id: game over, winner is $winner")
+          localView.showGameOver(winner)
+          Behaviors.stopped
       }
     }
 }

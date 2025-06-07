@@ -24,7 +24,7 @@ object FoodGeneratorActor {
       context.system.receptionist ! Receptionist.Subscribe(GameManagerServiceKey, listingAdapter)
 
       Behaviors.withTimers { timers =>
-        timers.startTimerAtFixedRate(GenerateFood, 2.seconds)
+        timers.startTimerAtFixedRate(GenerateFood, 1.seconds)
         active(None)
       }
     }

@@ -61,6 +61,14 @@ object GameManagerActor {
             world = world.copy(players = remainingPlayers, foods = remainingFoods)
             broadcastWorld()
 
+            world.players.find(_.mass > 10000) match {
+              case Some(winner) =>
+                players.values.foreach(_ ! GameOver(winner.id))
+                Behaviors.stopped
+              case None =>
+                Behaviors.same
+            }
+
           case None => // Player not found
         }
         Behaviors.same
