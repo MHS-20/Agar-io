@@ -14,23 +14,13 @@ object AIMovement:
     world.foods
       .sortBy(food => world.playerById(player).map(p => p.distanceTo(food)).getOrElse(Double.MaxValue))
       .headOption
-
-  /** Moves the AI toward the nearest food
-    *
-    * @param gameManager
-    *   The game state manager that provides world state and movement capabilities
-    */
-  def moveAI(name: String, gameManager: GameStateManager): Unit =
-    val world = gameManager.getWorld
-    val aiOpt = world.playerById(name)
-    val foodOpt = nearestFood(name, world)
-    (aiOpt, foodOpt) match
-      case (Some(ai), Some(food)) =>
-        val dx = food.x - ai.x
-        val dy = food.y - ai.y
-        val distance = math.hypot(dx, dy)
-        if (distance > 0)
-          val normalizedDx = dx / distance
-          val normalizedDy = dy / distance
-          gameManager.movePlayerDirection(name, normalizedDx, normalizedDy)
-      case _ => // Do nothing if AI or food doesn't exist
+  
+  def computeDirectionTowardNearestFood(playerId: String, world: World): Option[(Double, Double)] =
+    for {
+      player <- world.playerById(playerId)
+      food <- nearestFood(playerId, world)
+      dx = food.x - player.x
+      dy = food.y - player.y
+      distance = math.hypot(dx, dy)
+      if distance > 0
+    } yield (dx / distance, dy / distance)

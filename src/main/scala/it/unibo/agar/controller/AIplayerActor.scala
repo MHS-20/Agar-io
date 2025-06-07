@@ -42,23 +42,19 @@ object AIplayerActor {
           case WorldUpdate(world) =>
             lastWorld = Some(world)
             Behaviors.same
+            
+          case StartGame() => 
+            context.log.info(s"AIPlayer $id: game started")
+            // Inizializzare la logica di gioco, se necessario
+            Behaviors.same
 
           case Tick =>
-            (gameManagerOpt, lastWorld) match {
-              case (Some(gm), Some(world)) =>
-                // Calcolo la mossa con AIMovement
-                import it.unibo.agar.model.GameStateManager
-                val gameStateManager = new GameStateManager {
-                  override def getWorld: World = world
+            for {
+              gm <- gameManagerOpt
+              world <- lastWorld
+              (dx, dy) <- AIMovement.computeDirectionTowardNearestFood(id, world)
+            } gm ! PlayerMove(id, dx, dy)
 
-                  override def movePlayerDirection(playerId: String, dx: Double, dy: Double): Unit = {
-                    // Invia un messaggio di movimento al gameManager
-                    gm ! PlayerMove(playerId, dx, dy)
-                  }
-                }
-                AIMovement.moveAI(id, gameStateManager)
-              case _ =>
-            }
             Behaviors.same
         }
       }

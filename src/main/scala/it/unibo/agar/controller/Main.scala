@@ -1,9 +1,6 @@
 package it.unibo.agar.controller
 
-import it.unibo.agar.model.AIMovement
-import it.unibo.agar.model.GameInitializer
-import it.unibo.agar.model.MockGameStateManager
-import it.unibo.agar.model.World
+import it.unibo.agar.model.{AIMovement, GameInitializer, MockGameStateManager, Player, World}
 import it.unibo.agar.view.GlobalView
 import it.unibo.agar.view.LocalView
 
@@ -12,7 +9,6 @@ import java.util.Timer
 import java.util.TimerTask
 import scala.swing.*
 import scala.swing.Swing.onEDT
-
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
@@ -31,24 +27,26 @@ object Main extends SimpleSwingApplication:
     val gameManager = context.spawn(GameManagerActor(), "gameManager")
     val foodGenerator = context.spawn(FoodGeneratorActor(), "foodGenerator")
     val ai1 = context.spawn(AIplayerActor("ai1"), "aiPlayer1")
-    val ai2 = context.spawn(AIplayerActor("ai2"), "aiPlayer2")
+    //val ai2 = context.spawn(AIplayerActor("ai2"), "aiPlayer2")
     val player1 = context.spawn(PlayerActor("player1"), "player1")
-    
-//    Swing.onEDT {
-//      new GlobalView(gameManager).open()
-//    }
+
+    //    Swing.onEDT {
+    //      new GlobalView(gameManager).open()
+    //    }
 
     Behaviors.empty
-    
+
     //new GlobalView(manager).open()
   }
 
-  override def top: Frame = new Frame { visible = false }
+  override def top: Frame = new Frame {
+    visible = false
+  }
 
   override def main(args: Array[String]): Unit =
     ActorSystem(Main(), "AgarSystem")
     super.main(args)
-  
+
 //  private val timer = new Timer()
 //  private val task: TimerTask = new TimerTask:
 //    override def run(): Unit =
