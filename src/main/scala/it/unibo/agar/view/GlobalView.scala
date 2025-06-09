@@ -15,6 +15,6 @@ class GlobalView extends MainFrame:
       currentWorld.foreach(world => AgarViewUtils.drawWorld(g, world))
 
   def update(world: World): Unit =
-    println("Updating Global View with new world state")
+    // println("Updating Global View with new world state")
     currentWorld = Some(world)
     repaint()

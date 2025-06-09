@@ -8,7 +8,7 @@ import it.unibo.agar.model.Food
 
 object FoodGeneratorActor {
   val FoodGeneratorServiceKey: ServiceKey[FoodGeneratorCommand] = ServiceKey[FoodGeneratorCommand]("FoodGenerator")
-  val GameManagerServiceKey: ServiceKey[GameManagerCommand] = ServiceKey[GameManagerCommand]("GameManager")
+  val GameManagerServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
 
   def apply(): Behavior[FoodGeneratorCommand] =
     Behaviors.setup { context =>
@@ -17,7 +17,7 @@ object FoodGeneratorActor {
       //        context.messageAdapter(listing => GameManagerListing(listing))
 
       val listingAdapter = context.messageAdapter[Receptionist.Listing] { listing =>
-        GameManagerListing(listing.serviceInstances(GameManagerServiceKey))
+        WorldListing(listing.serviceInstances(GameManagerServiceKey))
       }
 
       // context.system.receptionist ! Receptionist.Register(FoodGeneratorServiceKey, context.self)
@@ -29,10 +29,10 @@ object FoodGeneratorActor {
       }
     }
 
-  def active(gameManagerOpt: Option[ActorRef[GameManagerCommand]]): Behavior[FoodGeneratorCommand] =
+  def active(gameManagerOpt: Option[ActorRef[WorldCommand]]): Behavior[FoodGeneratorCommand] =
     Behaviors.receive { (context, message) =>
       message match {
-        case GameManagerListing(gameManagers) =>
+        case WorldListing(gameManagers) =>
           gameManagers.headOption match {
             case Some(gmRef) if gameManagerOpt.isEmpty =>
               context.log.info("GameManager found, storing its reference")

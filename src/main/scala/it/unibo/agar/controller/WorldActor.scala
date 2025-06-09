@@ -4,11 +4,13 @@ import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import it.unibo.agar.model.{EatingManager, Food, Player, World}
+import scala.util.Random
 
-object GameManagerActor {
-  val GameManagerServiceKey: ServiceKey[GameManagerCommand] = ServiceKey[GameManagerCommand]("GameManager")
 
-  def apply(initialPlayers: Seq[Player], initialFood: Seq[Food]): Behavior[GameManagerCommand] = Behaviors.setup { context =>
+object WorldActor {
+  val GameManagerServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
+
+  def apply(initialPlayers: Seq[Player], initialFood: Seq[Food]): Behavior[WorldCommand] = Behaviors.setup { context =>
     context.system.receptionist ! Receptionist.Register(GameManagerServiceKey, context.self)
     var players = Map.empty[String, ActorRef[PlayerCommand]]
     var world = World(width = 1000, height = 1000, players = initialPlayers, foods = initialFood)
@@ -21,7 +23,7 @@ object GameManagerActor {
         context.log.info(s"Player $id joined")
         players += (id -> replyTo)
         // Add new player to world
-        val newPlayer = Player(id, x = 0, y = 0, mass = 120)
+        val newPlayer = Player(id, x =  Random.nextInt(1000), y = Random.nextInt(1000), mass = 120)
         world = world.copy(players = world.players :+ newPlayer)
         broadcastWorld()
         replyTo ! StartGame()

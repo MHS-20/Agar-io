@@ -4,17 +4,17 @@ import akka.actor.typed.ActorRef
 import it.unibo.agar.model.{Food, Player, World}
 
 // GameManager Messagges
-sealed trait GameManagerCommand
-final case class PlayerMove(id: String, dx: Double, dy: Double) extends GameManagerCommand
-final case class FoodGenerated(food: Food) extends GameManagerCommand
-final case class JoinPlayer(id: String, replyTo: ActorRef[PlayerCommand]) extends GameManagerCommand
-final case class LeavePlayer(id: String) extends GameManagerCommand
-final case class RequestWorld(replyTo: ActorRef[WorldResponse]) extends GameManagerCommand
-final case class WorldResponse(world: it.unibo.agar.model.World) extends GameManagerCommand
+sealed trait WorldCommand
+final case class PlayerMove(id: String, dx: Double, dy: Double) extends WorldCommand
+final case class FoodGenerated(food: Food) extends WorldCommand
+final case class JoinPlayer(id: String, replyTo: ActorRef[PlayerCommand]) extends WorldCommand
+final case class LeavePlayer(id: String) extends WorldCommand
+final case class RequestWorld(replyTo: ActorRef[WorldResponse]) extends WorldCommand
+final case class WorldResponse(world: it.unibo.agar.model.World) extends WorldCommand
 
 // Receptionist Listing
 sealed trait ReceptionistListingMessage
-final case class GameManagerListing(listings: Set[ActorRef[GameManagerCommand]]) extends ReceptionistListingMessage with PlayerCommand with AIPlayerCommand with FoodGeneratorCommand
+final case class WorldListing(listings: Set[ActorRef[WorldCommand]]) extends ReceptionistListingMessage with PlayerCommand with AIPlayerCommand with FoodGeneratorCommand
 
 // FoodGenerator Messages
 sealed trait FoodGeneratorCommand

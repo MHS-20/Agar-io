@@ -8,19 +8,19 @@ import scala.concurrent.duration._
 
 object AIplayerActor {
 
-  val GameManagerServiceKey: ServiceKey[GameManagerCommand] = ServiceKey[GameManagerCommand]("GameManager")
+  val GameManagerServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
 
   def apply(id: String): Behavior[AIPlayerCommand] =
     Behaviors.withTimers { timers =>
       Behaviors.setup[AIPlayerCommand] { context =>
 
-        var gameManagerOpt: Option[ActorRef[GameManagerCommand]] = None
+        var gameManagerOpt: Option[ActorRef[WorldCommand]] = None
         var lastWorld: Option[World] = None
 
         // Adapter per ricevere la lista dal Receptionist
         val listingAdapter: ActorRef[Receptionist.Listing] =
           context.messageAdapter { listing =>
-            GameManagerListing(listing.serviceInstances(GameManagerServiceKey))
+            WorldListing(listing.serviceInstances(GameManagerServiceKey))
           }
 
         context.system.receptionist ! Receptionist.Subscribe(GameManagerServiceKey, listingAdapter)
@@ -29,7 +29,7 @@ object AIplayerActor {
         timers.startTimerAtFixedRate(Tick, 100.millis)
 
         Behaviors.receiveMessage {
-          case GameManagerListing(gameManagers) =>
+          case WorldListing(gameManagers) =>
             gameManagers.headOption match {
               case Some(gm) if gameManagerOpt.isEmpty =>
                 context.log.info(s"AIPlayer $id: trovato GameManager, mi unisco")

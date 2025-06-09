@@ -13,19 +13,19 @@ object GlobalViewActor {
 
   case object PollTick extends GlobalViewCommand
 
-  case class GameManagerListing(listings: Set[ActorRef[GameManagerCommand]]) extends GlobalViewCommand
+  case class GameManagerListing(listings: Set[ActorRef[WorldCommand]]) extends GlobalViewCommand
 
   case class WrappedWorldResponse(world: World) extends GlobalViewCommand
 
   def apply(globalView: GlobalView): Behavior[GlobalViewCommand] = Behaviors.setup { context =>
     val listingAdapter = context.messageAdapter[Receptionist.Listing] {
       case listing: Receptionist.Listing =>
-        GameManagerListing(listing.serviceInstances(GameManagerActor.GameManagerServiceKey))
+        GameManagerListing(listing.serviceInstances(WorldActor.GameManagerServiceKey))
     }
 
     val worldResponseAdapter = context.messageAdapter[WorldResponse](res => WrappedWorldResponse(res.world))
 
-    context.system.receptionist ! Receptionist.Subscribe(GameManagerActor.GameManagerServiceKey, listingAdapter)
+    context.system.receptionist ! Receptionist.Subscribe(WorldActor.GameManagerServiceKey, listingAdapter)
 
     Behaviors.withTimers { timers =>
       timers.startTimerAtFixedRate(PollTick, 200.millis)
@@ -35,7 +35,7 @@ object GlobalViewActor {
 
   private def behavior(
                         globalView: GlobalView,
-                        managerOpt: Option[ActorRef[GameManagerCommand]],
+                        managerOpt: Option[ActorRef[WorldCommand]],
                         worldResponseAdapter: ActorRef[WorldResponse]
                       ): Behavior[GlobalViewCommand] =
     Behaviors.receive { (context, message) =>

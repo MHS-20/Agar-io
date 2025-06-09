@@ -28,7 +28,7 @@ object Main extends SimpleSwingApplication:
   def apply(): Behavior[Nothing] = Behaviors.setup[Nothing] { context =>
     players = players :+ Player(s"player1", Random.nextInt(width), Random.nextInt(height), 120.0)
 
-    val gameManager = context.spawn(GameManagerActor(players, foods), "gameManager")
+    val worldActor = context.spawn(WorldActor(Seq.empty, foods), "gameManager")
     val foodGenerator = context.spawn(FoodGeneratorActor(), "foodGenerator")
 
     for (i <- 1 to numPlayers) {

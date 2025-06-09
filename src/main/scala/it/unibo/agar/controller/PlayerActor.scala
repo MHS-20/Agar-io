@@ -6,11 +6,11 @@ import akka.actor.typed.scaladsl.Behaviors
 import it.unibo.agar.view.LocalView
 
 object PlayerActor {
-  val GameManagerServiceKey: ServiceKey[GameManagerCommand] = ServiceKey[GameManagerCommand]("GameManager")
+  val GameManagerServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
 
   def apply(id: String): Behavior[PlayerCommand] =
     Behaviors.setup { context =>
-      var gameManagerOpt: Option[ActorRef[GameManagerCommand]] = None
+      var gameManagerOpt: Option[ActorRef[WorldCommand]] = None
       val localView = new LocalView(id)
       localView.onMouseMoved = (point: java.awt.Point) =>
         val dx = (point.x - localView.size.width / 2) * 0.01
@@ -19,13 +19,13 @@ object PlayerActor {
 
       val listingAdapter: ActorRef[Receptionist.Listing] =
         context.messageAdapter { listing =>
-          GameManagerListing(listing.serviceInstances(GameManagerServiceKey))
+          WorldListing(listing.serviceInstances(GameManagerServiceKey))
         }
 
       context.system.receptionist ! Receptionist.Subscribe(GameManagerServiceKey, listingAdapter)
 
       Behaviors.receiveMessage {
-        case GameManagerListing(gameManagers) =>
+        case WorldListing(gameManagers) =>
           gameManagers.headOption match {
             case Some(gmRef) if gameManagerOpt.isEmpty =>
               context.log.info(s"Player $id: trovato GameManager, mi unisco")
