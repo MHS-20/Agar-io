@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 
 object AIplayerActor {
 
-  val GameManagerServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
+  val WorldServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
 
   def apply(id: String): Behavior[AIPlayerCommand] =
     Behaviors.withTimers { timers =>
@@ -20,10 +20,10 @@ object AIplayerActor {
         // Adapter per ricevere la lista dal Receptionist
         val listingAdapter: ActorRef[Receptionist.Listing] =
           context.messageAdapter { listing =>
-            WorldListing(listing.serviceInstances(GameManagerServiceKey))
+            WorldListing(listing.serviceInstances(WorldServiceKey))
           }
 
-        context.system.receptionist ! Receptionist.Subscribe(GameManagerServiceKey, listingAdapter)
+        context.system.receptionist ! Receptionist.Subscribe(WorldServiceKey, listingAdapter)
 
         // timer per AI ticks
         timers.startTimerAtFixedRate(Tick, 100.millis)

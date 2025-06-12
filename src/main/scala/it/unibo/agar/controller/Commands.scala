@@ -11,6 +11,8 @@ final case class JoinPlayer(id: String, replyTo: ActorRef[PlayerCommand]) extend
 final case class LeavePlayer(id: String) extends WorldCommand
 final case class RequestWorld(replyTo: ActorRef[WorldResponse]) extends WorldCommand
 final case class WorldResponse(world: it.unibo.agar.model.World) extends WorldCommand
+final case class TriggerGameOver(winnerId: String) extends WorldCommand
+
 
 // Receptionist Listing
 sealed trait ReceptionistListingMessage

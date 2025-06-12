@@ -1,6 +1,10 @@
 package it.unibo.agar.controller
 
-import it.unibo.agar.model.{AIMovement, GameInitializer, MockGameStateManager, Player, World}
+import it.unibo.agar.model.AIMovement
+import it.unibo.agar.model.GameInitializer
+import it.unibo.agar.model.MockGameStateManager
+import it.unibo.agar.model.Player
+import it.unibo.agar.model.World
 import it.unibo.agar.view.GlobalView
 import it.unibo.agar.view.LocalView
 
@@ -31,11 +35,12 @@ object Main extends SimpleSwingApplication:
     val worldActor = context.spawn(WorldActor(Seq.empty, foods), "gameManager")
     val foodGenerator = context.spawn(FoodGeneratorActor(), "foodGenerator")
 
-    for (i <- 1 to numPlayers) {
+    for (i <- 1 to numPlayers)
       context.spawn(AIplayerActor(s"ai$i"), s"aiPlayer$i")
-    }
 
     val player1 = context.spawn(PlayerActor("player1"), "player1")
+
+    val gameOverActor = context.spawn(GameOverActor(), "gameOverActor")
 
     val globalView = new GlobalView
     context.spawn(GlobalViewActor(globalView), "globalViewActor")

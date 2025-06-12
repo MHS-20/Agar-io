@@ -8,7 +8,7 @@ import it.unibo.agar.model.Food
 
 object FoodGeneratorActor {
   val FoodGeneratorServiceKey: ServiceKey[FoodGeneratorCommand] = ServiceKey[FoodGeneratorCommand]("FoodGenerator")
-  val GameManagerServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
+  val WorldServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
 
   def apply(): Behavior[FoodGeneratorCommand] =
     Behaviors.setup { context =>
@@ -17,11 +17,11 @@ object FoodGeneratorActor {
       //        context.messageAdapter(listing => GameManagerListing(listing))
 
       val listingAdapter = context.messageAdapter[Receptionist.Listing] { listing =>
-        WorldListing(listing.serviceInstances(GameManagerServiceKey))
+        WorldListing(listing.serviceInstances(WorldServiceKey))
       }
 
       // context.system.receptionist ! Receptionist.Register(FoodGeneratorServiceKey, context.self)
-      context.system.receptionist ! Receptionist.Subscribe(GameManagerServiceKey, listingAdapter)
+      context.system.receptionist ! Receptionist.Subscribe(WorldServiceKey, listingAdapter)
 
       Behaviors.withTimers { timers =>
         timers.startTimerAtFixedRate(GenerateFood, 1.seconds)

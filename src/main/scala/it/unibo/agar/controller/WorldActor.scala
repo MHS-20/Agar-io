@@ -8,10 +8,10 @@ import scala.util.Random
 
 
 object WorldActor {
-  val GameManagerServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
+  val WorldServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
 
   def apply(initialPlayers: Seq[Player], initialFood: Seq[Food]): Behavior[WorldCommand] = Behaviors.setup { context =>
-    context.system.receptionist ! Receptionist.Register(GameManagerServiceKey, context.self)
+    context.system.receptionist ! Receptionist.Register(WorldServiceKey, context.self)
     var players = Map.empty[String, ActorRef[PlayerCommand]]
     var world = World(width = 1000, height = 1000, players = initialPlayers, foods = initialFood)
 
@@ -63,13 +63,13 @@ object WorldActor {
             world = world.copy(players = remainingPlayers, foods = remainingFoods)
             broadcastWorld()
 
-            world.players.find(_.mass > 10000) match {
+            /* world.players.find(_.mass > 10000) match {
               case Some(winner) =>
                 players.values.foreach(_ ! GameOver(winner.id))
                 Behaviors.stopped
               case None =>
                 Behaviors.same
-            }
+            } */
 
           case None => // Player not found
         }
@@ -83,6 +83,11 @@ object WorldActor {
       case RequestWorld(replyTo) =>
         replyTo ! WorldResponse(world)
         Behaviors.same
+
+      case TriggerGameOver(winnerId) =>
+        players.values.foreach(_ ! GameOver(winnerId))
+        Behaviors.stopped
+
     }
   }
 }

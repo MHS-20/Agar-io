@@ -6,7 +6,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import it.unibo.agar.view.LocalView
 
 object PlayerActor {
-  val GameManagerServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
+  val WorldServiceKey: ServiceKey[WorldCommand] = ServiceKey[WorldCommand]("GameManager")
 
   def apply(id: String): Behavior[PlayerCommand] =
     Behaviors.setup { context =>
@@ -19,10 +19,10 @@ object PlayerActor {
 
       val listingAdapter: ActorRef[Receptionist.Listing] =
         context.messageAdapter { listing =>
-          WorldListing(listing.serviceInstances(GameManagerServiceKey))
+          WorldListing(listing.serviceInstances(WorldServiceKey))
         }
 
-      context.system.receptionist ! Receptionist.Subscribe(GameManagerServiceKey, listingAdapter)
+      context.system.receptionist ! Receptionist.Subscribe(WorldServiceKey, listingAdapter)
 
       Behaviors.receiveMessage {
         case WorldListing(gameManagers) =>
